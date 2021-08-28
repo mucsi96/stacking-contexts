@@ -1,0 +1,18 @@
+{
+  "name": "stacking-contexts",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/mucsi96/stacking-contexts.git",
+  "author": "Igor Bari <mucsi96@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc src/stackingContexts.ts --outDir dist"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.1",
+    "jest": "^27.1.0",
+    "ts-jest": "^27.0.5",
+    "typescript": "^4.4.2"
+  }
+}
