@@ -1,10 +1,15 @@
 export type StackingContext = {
-  element: Element;
+  id: number;
+  level: number;
+  parents: number[];
+  selector: string;
   zIndex?: string;
-  children?: StackingContext[];
 };
 
-export function isFormingStackingContext(element: Element): boolean {
+let id = -1;
+const colorMap = new Map();
+
+export function isFormingStackingContext(element: HTMLElement): boolean {
   const styles = window.getComputedStyle(element) as any;
   const parentStyles =
     element.parentElement && window.getComputedStyle(element.parentElement);
@@ -64,22 +69,56 @@ export function isFormingStackingContext(element: Element): boolean {
   return true;
 }
 
-export function getStackingContexts(root: Element): StackingContext[] {
-  const children = Array.from(root.children)
+function getNestedStackingContxts(parents: number[], root: HTMLElement) {
+  return Array.from(root.children)
     .filter((child) => child.nodeType === Node.ELEMENT_NODE)
-    .flatMap((child) => getStackingContexts(child));
+    .flatMap((child) =>
+      getStackingContextsRecursive(parents, child as HTMLElement)
+    );
+}
 
-  if (isFormingStackingContext(root)) {
-    const styles = window.getComputedStyle(root);
-
-    return [
-      {
-        element: root,
-        ...(styles.zIndex && { zIndex: styles.zIndex }),
-        ...(children.length && { children }),
-      },
-    ];
+function getBackgroundColor(parents: number[]) {
+  if (colorMap.has(parents)) {
+    return colorMap.get(parents);
   }
 
-  return children;
+  const color = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+
+  colorMap.set(parents, color);
+
+  return color;
+}
+
+function getStackingContextsRecursive(
+  parents: number[],
+  root: HTMLElement
+): StackingContext[] {
+  if (isFormingStackingContext(root)) {
+    id++;
+    const zIndex = root.style.zIndex;
+    const context = {
+      id,
+      parents,
+      level: parents.length,
+      selector: `${root.tagName.toLocaleLowerCase()}${
+        root.id ? `#${root.id}` : ""
+      }${root.className ? `.${root.className}` : ""}`,
+      ...(zIndex && { zIndex }),
+    };
+
+    root.style.backgroundColor = getBackgroundColor(parents);
+    root.title = JSON.stringify(context)
+      .replace(/[{}"]/g, "")
+      .replace(/:/g, " : ")
+      .replace(/,/g, "\n");
+
+    return [context, ...getNestedStackingContxts([...parents, id], root)];
+  }
+
+  return getNestedStackingContxts(parents, root);
+}
+
+export function getStackingContexts() {
+  id = -1;
+  return getStackingContextsRecursive([], document.body);
 }

@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "build": "tsc src/stackingContexts.ts --outDir dist"
+    "build": "tsc --project tsconfig.build.json"
   },
   "devDependencies": {
     "@types/jest": "^27.0.1",
