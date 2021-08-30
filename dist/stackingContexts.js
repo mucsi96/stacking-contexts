@@ -1,5 +1,5 @@
 let id = -1;
-const colorMap = new Map();
+const colorMap = {};
 export function isFormingStackingContext(element) {
     const styles = window.getComputedStyle(element);
     const parentStyles = element.parentElement && window.getComputedStyle(element.parentElement);
@@ -49,40 +49,41 @@ export function isFormingStackingContext(element) {
     }
     return true;
 }
-function getNestedStackingContxts(parents, root) {
+function getNestedStackingContexts(level, parentId, root) {
     return Array.from(root.children)
         .filter((child) => child.nodeType === Node.ELEMENT_NODE)
-        .flatMap((child) => getStackingContextsRecursive(parents, child));
+        .flatMap((child) => getStackingContextsRecursive(level, parentId, child));
 }
-function getBackgroundColor(parents) {
-    if (colorMap.has(parents)) {
-        return colorMap.get(parents);
+function getBackgroundColor(parentId) {
+    if (colorMap[parentId]) {
+        return colorMap[parentId];
     }
     const color = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
-    colorMap.set(parents, color);
+    colorMap[parentId] = color;
     return color;
 }
-function getStackingContextsRecursive(parents, root) {
+function getStackingContextsRecursive(level, parentId, root) {
     if (isFormingStackingContext(root)) {
         id++;
-        const zIndex = root.style.zIndex;
+        const styles = window.getComputedStyle(root);
+        const zIndex = styles.zIndex;
         const context = {
             id,
-            parents,
-            level: parents.length,
+            ...(parentId && { parent: parentId }),
+            level,
             selector: `${root.tagName.toLocaleLowerCase()}${root.id ? `#${root.id}` : ""}${root.className ? `.${root.className}` : ""}`,
             ...(zIndex && { zIndex }),
         };
-        root.style.backgroundColor = getBackgroundColor(parents);
+        root.style.backgroundColor = getBackgroundColor(parentId);
         root.title = JSON.stringify(context)
             .replace(/[{}"]/g, "")
             .replace(/:/g, " : ")
             .replace(/,/g, "\n");
-        return [context, ...getNestedStackingContxts([...parents, id], root)];
+        return [context, ...getNestedStackingContexts(level + 1, id, root)];
     }
-    return getNestedStackingContxts(parents, root);
+    return getNestedStackingContexts(level, parentId, root);
 }
 export function getStackingContexts() {
-    id = -1;
-    return getStackingContextsRecursive([], document.body);
+    id = 0;
+    return getStackingContextsRecursive(0, 0, document.body);
 }
