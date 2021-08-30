@@ -1,7 +1,7 @@
 export type StackingContext = {
   id: number;
   level: number;
-  parent?: number;
+  parent: number;
   selector: string;
   zIndex?: string;
 };
@@ -102,9 +102,9 @@ function getStackingContextsRecursive(
     id++;
     const styles = window.getComputedStyle(root);
     const zIndex = styles.zIndex;
-    const context = {
+    const context: StackingContext = {
       id,
-      ...(parentId && { parent: parentId }),
+      parent: parentId,
       level,
       selector: `${root.tagName.toLocaleLowerCase()}${
         root.id ? `#${root.id}` : ""

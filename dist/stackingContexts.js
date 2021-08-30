@@ -69,7 +69,7 @@ function getStackingContextsRecursive(level, parentId, root) {
         const zIndex = styles.zIndex;
         const context = {
             id,
-            ...(parentId && { parent: parentId }),
+            parent: parentId,
             level,
             selector: `${root.tagName.toLocaleLowerCase()}${root.id ? `#${root.id}` : ""}${root.className ? `.${root.className}` : ""}`,
             ...(zIndex && { zIndex }),

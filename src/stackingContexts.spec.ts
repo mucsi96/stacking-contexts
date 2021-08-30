@@ -7,7 +7,7 @@ describe("getStackingContexts", () => {
       <div></div>
     `;
     expect(getStackingContexts()).toEqual([
-      { id: 1, level: 0, selector: "div#a-in-root" },
+      { id: 1, level: 0, parent: 0, selector: "div#a-in-root" },
     ]);
   });
 
@@ -19,7 +19,7 @@ describe("getStackingContexts", () => {
       </div>
     `;
     expect(getStackingContexts()).toEqual([
-      { id: 1, level: 0, selector: "div#a-nested" },
+      { id: 1, level: 0, parent: 0, selector: "div#a-nested" },
     ]);
   });
 
@@ -35,7 +35,7 @@ describe("getStackingContexts", () => {
       </div>
     `;
     expect(getStackingContexts()).toEqual([
-      { id: 1, level: 0, selector: "div#a-deeply-nested" },
+      { id: 1, level: 0, parent: 0, selector: "div#a-deeply-nested" },
     ]);
   });
 
@@ -46,8 +46,8 @@ describe("getStackingContexts", () => {
       <div id="b" style="isolation: isolate;"></div>
     `;
     expect(getStackingContexts()).toEqual([
-      { id: 1, level: 0, selector: "div#a" },
-      { id: 2, level: 0, selector: "div#b" },
+      { id: 1, level: 0, parent: 0, selector: "div#a" },
+      { id: 2, level: 0, parent: 0, selector: "div#b" },
     ]);
   });
 
@@ -60,8 +60,8 @@ describe("getStackingContexts", () => {
       <div id="b" style="isolation: isolate;"></div>
     `;
     expect(getStackingContexts()).toEqual([
-      { id: 1, level: 0, selector: "div#a" },
-      { id: 2, level: 0, selector: "div#b" },
+      { id: 1, level: 0, parent: 0, selector: "div#a" },
+      { id: 2, level: 0, parent: 0, selector: "div#b" },
     ]);
   });
 
@@ -79,7 +79,7 @@ describe("getStackingContexts", () => {
       <div></div>
     `;
     expect(getStackingContexts()).toEqual([
-      { id: 1, level: 0, selector: "div#a" },
+      { id: 1, level: 0, parent: 0, selector: "div#a" },
       { id: 2, level: 1, parent: 1, selector: "div#b" },
       { id: 3, level: 2, parent: 2, selector: "div#c" },
     ]);
